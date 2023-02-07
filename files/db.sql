@@ -12,5 +12,5 @@ CREATE TABLE public.settings (
 	CONSTRAINT settings_pkey PRIMARY KEY (id)
 );
 CREATE TRIGGER settings BEFORE UPDATE ON settings FOR EACH ROW EXECUTE PROCEDURE update_modified_column();
-GRANT ALL ON SEQUENCE public.settings_id_seq TO amarthaplus;
-GRANT SELECT,INSERT,UPDATE,DELETE ON settings TO amarthaplus;
+GRANT ALL ON SEQUENCE public.settings_id_seq TO postgres;
+GRANT SELECT,INSERT,UPDATE,DELETE ON settings TO postgres;
