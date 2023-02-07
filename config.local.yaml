@@ -1,0 +1,44 @@
+---
+env: dev
+port: 3000
+apiTokenKey: abcdefghijklmn
+logLevel: debug
+logFormat: gce
+appCorsDomain: "*"
+appTimeout: 100
+
+# postgres database
+postgres:
+  maxOpenConnections: 4
+  maxIdleConnections: 2
+  maxIdleLifetime: 10000
+  master:
+    host: 127.0.0.1
+    port: 5432
+    schema: public
+    dbName: db_name
+    user: postgres
+    password: postgres
+  slave:
+    host: 127.0.0.1
+    port: 5432
+    schema: public
+    dbName: db_name
+    user: postgres
+    password: postgres
+
+# redis
+redis:
+  host: localhost:6379
+
+# new relic
+newRelic:
+  applicationName: "go-template"
+  isActive: false
+newReliclicenseKey: ""
+
+swagger:
+  title: "Go Template"
+  version: "v1.0"
+  url: "localhost:3000"
+  schemes: "https"

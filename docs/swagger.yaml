@@ -1,0 +1,488 @@
+definitions:
+  services.Pagination:
+    properties:
+      current_page:
+        example: 1
+        type: integer
+      last_page:
+        example: 1
+        type: integer
+      per_page:
+        example: 10
+        type: integer
+      total:
+        example: 1
+        type: integer
+    type: object
+  setting.SettingResponse:
+    properties:
+      created_at:
+        example: 2022-06-22 11:34:19.214 +0700
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: setting_name
+        type: string
+      updated_at:
+        example: 2022-06-22 11:34:19.214 +0700
+        type: string
+      value: {}
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/apiAdmin/setting:
+    get:
+      consumes:
+      - application/json
+      description: Get all setting data from database neobank
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: limit data
+        in: query
+        name: limit
+        type: string
+      - description: Search by setting name
+        in: query
+        name: search
+        type: string
+      - description: Order data
+        in: query
+        name: order_by
+        type: string
+      - description: Sort data
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/setting.SettingResponse'
+                  type: array
+                meta:
+                  $ref: '#/definitions/services.Pagination'
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Show All Settings with Pagination
+      tags:
+      - API Setting
+    post:
+      consumes:
+      - application/json
+      description: Create setting data to database neobank
+      parameters:
+      - description: setting name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: setting value
+        in: body
+        name: value
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: integer
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: integer
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: integer
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: integer
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Setting Data
+      tags:
+      - API Setting
+  /v1/apiAdmin/setting/id/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete setting data from database neobank
+      parameters:
+      - description: setting id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Setting
+      tags:
+      - API Setting
+  /v1/apiStatic/setting/all:
+    get:
+      consumes:
+      - application/json
+      description: Get all setting data from database neobank
+      parameters:
+      - description: Search by setting name
+        in: query
+        name: search
+        type: string
+      - description: Order data
+        in: query
+        name: order_by
+        type: string
+      - description: Sort data
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/setting.SettingResponse'
+                  type: array
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Show All Settings
+      tags:
+      - API Setting
+  /v1/apiStatic/setting/id/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Edit setting data from database neobank
+      parameters:
+      - description: setting id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: setting name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: setting value
+        in: body
+        name: value
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Setting
+      tags:
+      - API Setting
+  /v1/apiStatic/setting/one:
+    get:
+      consumes:
+      - application/json
+      description: Get one setting data from database neobank
+      parameters:
+      - description: setting id
+        in: query
+        name: id
+        type: string
+      - description: setting name
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  $ref: '#/definitions/setting.SettingResponse'
+                success:
+                  type: boolean
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                data:
+                  type: object
+                stat_msg:
+                  type: string
+                success:
+                  type: boolean
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Find One Setting
+      tags:
+      - API Setting
+securityDefinitions:
+  ApiKeyAuth:
+    in: Header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
