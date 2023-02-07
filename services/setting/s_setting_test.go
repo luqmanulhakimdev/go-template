@@ -34,7 +34,7 @@ func TestSettingService_SelectAll(t *testing.T) {
 	settingData := []settingEntity.Setting{
 		{
 			ID:        1,
-			Name:      settingEntity.SettingTypeDefault,
+			Name:      "",
 			Value:     "{}",
 			CreatedAt: "2021-12-01T13:19:12.801+07:00",
 			UpdatedAt: "2021-12-01T15:14:38.09019+07:00",
@@ -115,7 +115,7 @@ func TestSettingService_FindAll(t *testing.T) {
 	settingData := []settingEntity.Setting{
 		{
 			ID:        1,
-			Name:      settingEntity.SettingTypeDefault,
+			Name:      "",
 			Value:     "{}",
 			CreatedAt: "2021-12-01T13:19:12.801+07:00",
 			UpdatedAt: "2021-12-01T15:14:38.09019+07:00",
@@ -195,7 +195,7 @@ func TestSettingService_FindAll(t *testing.T) {
 func TestSettingService_FindOne(t *testing.T) {
 	settingData := settingEntity.Setting{
 		ID:        1,
-		Name:      settingEntity.SettingTypeDefault,
+		Name:      "",
 		Value:     "{}",
 		CreatedAt: "2021-12-01T13:19:12.801+07:00",
 		UpdatedAt: "2021-12-01T15:14:38.09019+07:00",
@@ -273,214 +273,14 @@ func TestSettingService_FindOne(t *testing.T) {
 	}
 }
 
-func TestSettingService_FindDefaultSetting(t *testing.T) {
-	settingData := settingEntity.SettingDefault{}
-	tests := []struct {
-		name        string
-		doMock      func(mock *settingMock.MockSettingRepo, res settingEntity.Setting)
-		wantSetting settingEntity.Setting
-		want        settingEntity.SettingDefault
-		wantErr     error
-	}{
-		{
-			name: "flow success",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, nil)
-			},
-			want:    settingData,
-			wantErr: nil,
-		},
-		{
-			name: "flow error",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, caseError)
-			},
-			want:    settingEntity.SettingDefault{},
-			wantErr: caseError,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-
-			mockRedis := redisMock.NewMockIRedis(mockCtrl)
-
-			mockSettingRepo := settingMock.NewMockSettingRepo(mockCtrl)
-			settingService := settingService.NewSettingService(mockSettingRepo, mockRedis)
-			tt.doMock(mockSettingRepo, tt.wantSetting)
-
-			got, err := settingService.FindDefaultSetting(context.Background())
-			if err != tt.wantErr {
-				t.Errorf("settingService.FindDefaultSetting() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
-			opt := cmp.FilterValues(func(x, y interface{}) bool {
-				vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-				return (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
-					(vx.Kind() == reflect.Slice || vx.Kind() == reflect.Map) &&
-					(vx.Len() == 0 && vy.Len() == 0)
-			}, alwaysEqual)
-			if !cmp.Equal(got, tt.want, opt) {
-				t.Errorf("settingService.FindDefaultSetting()  = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestSettingService_FindIncentiveBudgetSetting(t *testing.T) {
-	settingData := settingEntity.SettingIncentiveBudget{
-		OriginAccountNumber:      "",
-		DestinationAccountNumber: "",
-		OriginDescription:        "",
-		DestinationDescription:   "",
-		MinimumBudget:            0,
-	}
-	tests := []struct {
-		name        string
-		doMock      func(mock *settingMock.MockSettingRepo, res settingEntity.Setting)
-		wantSetting settingEntity.Setting
-		want        settingEntity.SettingIncentiveBudget
-		wantErr     error
-	}{
-		{
-			name: "flow success",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			want:    settingData,
-			wantErr: nil,
-		},
-		{
-			name: "flow error",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, caseError)
-			},
-			want:    settingEntity.SettingIncentiveBudget{},
-			wantErr: caseError,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-
-			mockRedis := redisMock.NewMockIRedis(mockCtrl)
-
-			mockSettingRepo := settingMock.NewMockSettingRepo(mockCtrl)
-			settingService := settingService.NewSettingService(mockSettingRepo, mockRedis)
-			tt.doMock(mockSettingRepo, tt.wantSetting)
-
-			got, err := settingService.FindIncentiveBudgetSetting(context.Background())
-			if err != tt.wantErr {
-				t.Errorf("settingService.FindIncentiveBudgetSetting() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
-			opt := cmp.FilterValues(func(x, y interface{}) bool {
-				vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-				return (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
-					(vx.Kind() == reflect.Slice || vx.Kind() == reflect.Map) &&
-					(vx.Len() == 0 && vy.Len() == 0)
-			}, alwaysEqual)
-			if !cmp.Equal(got, tt.want, opt) {
-				t.Errorf("settingService.FindIncentiveBudgetSetting()  = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestSettingService_FindIncentiveBudgetApprovalSetting(t *testing.T) {
-	settingData := settingEntity.SettingIncentiveBudgetApproval{
-		DebitAccountNumber:  "",
-		CreditAccountNumber: "",
-	}
-	tests := []struct {
-		name        string
-		doMock      func(mock *settingMock.MockSettingRepo, res settingEntity.Setting)
-		wantSetting settingEntity.Setting
-		want        settingEntity.SettingIncentiveBudgetApproval
-		wantErr     error
-	}{
-		{
-			name: "flow success",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, nil)
-			},
-			want:    settingData,
-			wantErr: nil,
-		},
-		{
-			name: "flow error",
-			doMock: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, caseError)
-			},
-			want:    settingEntity.SettingIncentiveBudgetApproval{},
-			wantErr: caseError,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockCtrl := gomock.NewController(t)
-			defer mockCtrl.Finish()
-
-			mockRedis := redisMock.NewMockIRedis(mockCtrl)
-
-			mockSettingRepo := settingMock.NewMockSettingRepo(mockCtrl)
-			settingService := settingService.NewSettingService(mockSettingRepo, mockRedis)
-			tt.doMock(mockSettingRepo, tt.wantSetting)
-
-			got, err := settingService.FindIncentiveBudgetApprovalSetting(context.Background())
-			if err != tt.wantErr {
-				t.Errorf("settingService.FindIncentiveBudgetApprovalSetting() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
-			opt := cmp.FilterValues(func(x, y interface{}) bool {
-				vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
-				return (vx.IsValid() && vy.IsValid() && vx.Type() == vy.Type()) &&
-					(vx.Kind() == reflect.Slice || vx.Kind() == reflect.Map) &&
-					(vx.Len() == 0 && vy.Len() == 0)
-			}, alwaysEqual)
-			if !cmp.Equal(got, tt.want, opt) {
-				t.Errorf("settingService.FindIncentiveBudgetApprovalSetting()  = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestSettingService_Create(t *testing.T) {
 	ctx := context.Background()
 	db, mocks, _ := sqlxmock.Newx()
 	mocks.ExpectBegin()
 	tx, _ := db.Beginx()
 	settingData := settingEntity.Setting{
-		Name:  settingEntity.SettingTypeDefault,
-		Value: "{\"asana_email_assignee\": \"test@mail.com\",\"asana_comment_mention_id\": \"123\",\"asana_email_followers\": [\"test@mail.com\"]}",
-	}
-	settingDataIncentiveBudget := settingEntity.Setting{
-		Name:  settingEntity.SettingTypeIncentiveBudget,
-		Value: "{\"origin_account_number\": \"12345\", \"destination_account_number\": \"12345\", \"origin_description\": \"BD ANR\", \"destination_description\": \"BRI Escrow ANR\"}",
-	}
-	settingDataBudgetApproval := settingEntity.Setting{
-		Name:  settingEntity.SettingTypeIncentiveBudgetApproval,
-		Value: "{\"debit_account_number\": \"12345\", \"credit_account_number\": \"12345\"}",
+		Name:  "",
+		Value: "{\"key\": \"value\"}",
 	}
 	tests := []struct {
 		name           string
@@ -493,11 +293,11 @@ func TestSettingService_Create(t *testing.T) {
 		wantErr        error
 	}{
 		{
-			name: "flow success default",
+			name: "flow success",
 			args: settingData,
 			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, nil)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
@@ -510,45 +310,11 @@ func TestSettingService_Create(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "flow success incentive budget",
-			args: settingDataIncentiveBudget,
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
-				mock.EXPECT().CreateTx(ctx).Return(tx, nil)
-			},
-			doMock: func(mock *settingMock.MockSettingRepo, res int) {
-				mock.EXPECT().Create(gomock.Any(), tx, &settingDataIncentiveBudget).Return(res, nil)
-			},
-			want:    1,
-			wantErr: nil,
-		},
-		{
-			name: "flow success budget approval",
-			args: settingDataBudgetApproval,
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
-				mock.EXPECT().CreateTx(ctx).Return(tx, nil)
-			},
-			doMock: func(mock *settingMock.MockSettingRepo, res int) {
-				mock.EXPECT().Create(gomock.Any(), tx, &settingDataBudgetApproval).Return(res, nil)
-			},
-			want:    1,
-			wantErr: nil,
-		},
-		{
 			name: "flow error",
 			args: settingData,
 			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, nil)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
@@ -565,7 +331,7 @@ func TestSettingService_Create(t *testing.T) {
 			args: settingData,
 			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, nil)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
@@ -580,7 +346,7 @@ func TestSettingService_Create(t *testing.T) {
 			args: settingData,
 			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, caseError)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
@@ -593,7 +359,7 @@ func TestSettingService_Create(t *testing.T) {
 			args: settingData,
 			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(settingEntity.Setting{
 					ID: 1,
 				}, nil)
@@ -602,214 +368,6 @@ func TestSettingService_Create(t *testing.T) {
 			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
 			want:           0,
 			wantErr:        errHelper.SettingRegistered.Error,
-		},
-		{
-			name: "flow error asana email assignee",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeDefault,
-				Value: "{\"asana_email_assignee\": \"\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.AsanaEmailAssigneeRequired.Error,
-		},
-		{
-			name: "flow error asana comment mention id",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeDefault,
-				Value: "{\"asana_email_assignee\": \"test@mail.com\",\"asana_comment_mention_id\": \"\",\"asana_email_followers\": [\"test@mail.com\"]}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.AsanaCommentMentionIDRequired.Error,
-		},
-		{
-			name: "flow error asana email followers",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeDefault,
-				Value: "{\"asana_email_assignee\": \"test@mail.com\",\"asana_comment_mention_id\": \"123\",\"asana_email_followers\": []}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.AsanaEmailFollowersRequired.Error,
-		},
-		{
-			name: "flow error origin account number",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudget,
-				Value: "{\"origin_account_number\": \"\", \"destination_account_number\": \"12345\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.OriginAccountNumberRequired.Error,
-		},
-		{
-			name: "flow error destination account number",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudget,
-				Value: "{\"origin_account_number\": \"12345\", \"destination_account_number\": \"\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.DestinationAccountNumberRequired.Error,
-		},
-		{
-			name: "flow error origin decription",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudget,
-				Value: "{\"origin_account_number\": \"12345\", \"destination_account_number\": \"12345\", \"origin_description\": \"\", \"destination_description\": \"desc\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.OriginDescriptionRequired.Error,
-		},
-		{
-			name: "flow error destination decription",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudget,
-				Value: "{\"origin_account_number\": \"12345\", \"destination_account_number\": \"12345\", \"origin_description\": \"desc\", \"destination_description\": \"\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.DestinationDescriptionRequired.Error,
-		},
-		{
-			name: "flow error debit account number",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudgetApproval,
-				Value: "{\"debit_account_number\": \"\", \"credit_account_number\": \"123\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.DebitAccountNumberRequired.Error,
-		},
-		{
-			name: "flow error credit account number",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudgetApproval,
-				Value: "{\"debit_account_number\": \"123\", \"credit_account_number\": \"\"}",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.CreditAccountNumberRequired.Error,
-		},
-		{
-			name: "flow error incentive budget convert value",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudget,
-				Value: "[]",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudget,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.InvalidDataSetting.Error,
-		},
-		{
-			name: "flow error budget approval convert value",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeIncentiveBudgetApproval,
-				Value: "[]",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.InvalidDataSetting.Error,
-		},
-		{
-			name: "flow error default convert value",
-			args: settingEntity.Setting{
-				Name:  settingEntity.SettingTypeDefault,
-				Value: "[]",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.InvalidDataSetting.Error,
-		},
-		{
-			name: "flow error invalid name",
-			args: settingEntity.Setting{
-				Name:  "",
-				Value: "[]",
-			},
-			doMockFindOne: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
-				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: "",
-				}).Return(res, nil)
-			},
-			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
-			doMock:         func(mock *settingMock.MockSettingRepo, res int) {},
-			want:           0,
-			wantErr:        errHelper.InvalidName.Error,
 		},
 	}
 
@@ -852,8 +410,8 @@ func TestSettingService_Update(t *testing.T) {
 	tx, _ := db.Beginx()
 	settingData := settingEntity.Setting{
 		ID:    1,
-		Name:  settingEntity.SettingTypeDefault,
-		Value: "{\"asana_email_assignee\": \"test@mail.com\",\"asana_comment_mention_id\": \"123\",\"asana_email_followers\": [\"test@mail.com\"]}",
+		Name:  "",
+		Value: "{\"key\": \"value\"}",
 	}
 	tests := []struct {
 		name              string
@@ -905,7 +463,7 @@ func TestSettingService_Update(t *testing.T) {
 			},
 			doMockFindOneName: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, nil)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
@@ -929,7 +487,7 @@ func TestSettingService_Update(t *testing.T) {
 			},
 			doMockFindOneName: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, nil)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {
@@ -967,7 +525,7 @@ func TestSettingService_Update(t *testing.T) {
 			},
 			doMockFindOneName: func(mock *settingMock.MockSettingRepo, res settingEntity.Setting) {
 				mock.EXPECT().FindOne(gomock.Any(), &settingController.SettingParameter{
-					Name: settingEntity.SettingTypeDefault,
+					Name: "",
 				}).Return(res, caseError)
 			},
 			doMockCreateTx: func(mock *settingMock.MockSettingRepo) {},
@@ -1025,7 +583,7 @@ func TestSettingService_Delete(t *testing.T) {
 	tx, _ := db.Beginx()
 	settingData := settingEntity.Setting{
 		ID:   1,
-		Name: settingEntity.SettingTypeDefault,
+		Name: "",
 	}
 	tests := []struct {
 		name           string

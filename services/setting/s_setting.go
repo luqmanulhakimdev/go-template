@@ -10,8 +10,6 @@ import (
 	settingRequest "go-template/controllers/setting"
 	settingEntity "go-template/entities/setting"
 	errHelper "go-template/helpers/errors"
-	"go-template/helpers/interfacepkg"
-	interfaceHelper "go-template/helpers/interfacepkg"
 
 	"go-template/logger"
 	"go-template/services"
@@ -94,138 +92,7 @@ func (service settingService) FindOne(ctx context.Context, parameters *settingRe
 	return
 }
 
-func (service settingService) FindDefaultSetting(ctx context.Context) (res settingEntity.SettingDefault, err error) {
-	data, err := service.settingRepo.FindOne(ctx, &settingRequest.SettingParameter{
-		Name: settingEntity.SettingTypeDefault,
-	})
-	if err != nil {
-		logger.ErrorWithStack(ctx, err, err.Error())
-		return
-	}
-
-	// unmarshall value json string to struct
-	interfacepkg.UnmarshallCb(data.Value, &res)
-
-	return
-}
-
-func (service settingService) FindIncentiveBudgetSetting(ctx context.Context) (res settingEntity.SettingIncentiveBudget, err error) {
-	data, err := service.settingRepo.FindOne(ctx, &settingRequest.SettingParameter{
-		Name: settingEntity.SettingTypeIncentiveBudget,
-	})
-	if err != nil {
-		logger.ErrorWithStack(ctx, err, err.Error())
-		return
-	}
-
-	// unmarshall value json string to struct
-	interfacepkg.UnmarshallCb(data.Value, &res)
-
-	return
-}
-
-func (service settingService) FindIncentiveBudgetApprovalSetting(ctx context.Context) (res settingEntity.SettingIncentiveBudgetApproval, err error) {
-	data, err := service.settingRepo.FindOne(ctx, &settingRequest.SettingParameter{
-		Name: settingEntity.SettingTypeIncentiveBudgetApproval,
-	})
-	if err != nil {
-		logger.ErrorWithStack(ctx, err, err.Error())
-		return
-	}
-
-	// unmarshall value json string to struct
-	interfacepkg.UnmarshallCb(data.Value, &res)
-
-	return
-}
-
 func (service settingService) checkSettingDefault(ctx context.Context, data string) (err error) {
-	values := settingEntity.SettingDefault{}
-	err = interfaceHelper.ConvertStrToInterface(data, &values)
-	if err != nil {
-		err = errHelper.InvalidDataSetting.Error
-		logger.ErrorWithStack(ctx, err, "error convert value")
-		return
-	}
-
-	if values.AsanaEmailAssignee == "" {
-		err = errHelper.AsanaEmailAssigneeRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if values.AsanaCommentMentionID == "" {
-		err = errHelper.AsanaCommentMentionIDRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if len(values.AsanaEmailFollowers) == 0 {
-		err = errHelper.AsanaEmailFollowersRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	return nil
-}
-
-func (service settingService) checkSettingIncentiveBudget(ctx context.Context, data string) (err error) {
-	values := settingEntity.SettingIncentiveBudget{}
-	err = interfaceHelper.ConvertStrToInterface(data, &values)
-	if err != nil {
-		err = errHelper.InvalidDataSetting.Error
-		logger.ErrorWithStack(ctx, err, "error convert value")
-		return
-	}
-
-	if values.OriginAccountNumber == "" {
-		err = errHelper.OriginAccountNumberRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if values.DestinationAccountNumber == "" {
-		err = errHelper.DestinationAccountNumberRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if values.OriginDescription == "" {
-		err = errHelper.OriginDescriptionRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if values.DestinationDescription == "" {
-		err = errHelper.DestinationDescriptionRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	return nil
-}
-
-func (service settingService) checkSettingIncentiveBudgetApproval(ctx context.Context, data string) (err error) {
-	values := settingEntity.SettingIncentiveBudgetApproval{}
-	err = interfaceHelper.ConvertStrToInterface(data, &values)
-	if err != nil {
-		err = errHelper.InvalidDataSetting.Error
-		logger.ErrorWithStack(ctx, err, "error convert value")
-		return
-	}
-
-	if values.DebitAccountNumber == "" {
-		err = errHelper.DebitAccountNumberRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
-	if values.CreditAccountNumber == "" {
-		err = errHelper.CreditAccountNumberRequired.Error
-		logger.ErrorWithStack(ctx, err, errHelper.ErrorValidationValue.Message)
-		return
-	}
-
 	return nil
 }
 
@@ -242,30 +109,6 @@ func (service settingService) checkData(ctx context.Context, input *settingEntit
 	if oldData.ID != 0 && oldData.ID != input.ID {
 		err = errHelper.SettingRegistered.Error
 		logger.ErrorWithStack(ctx, err, "name registered")
-		return
-	}
-
-	if input.Name == settingEntity.SettingTypeDefault {
-		err = service.checkSettingDefault(ctx, input.Value)
-		if err != nil {
-			logger.ErrorWithStack(ctx, err, "check setting default")
-			return
-		}
-	} else if input.Name == settingEntity.SettingTypeIncentiveBudget {
-		err = service.checkSettingIncentiveBudget(ctx, input.Value)
-		if err != nil {
-			logger.ErrorWithStack(ctx, err, "check setting incentive budget")
-			return
-		}
-	} else if input.Name == settingEntity.SettingTypeIncentiveBudgetApproval {
-		err = service.checkSettingIncentiveBudgetApproval(ctx, input.Value)
-		if err != nil {
-			logger.ErrorWithStack(ctx, err, "check setting incentive budget approval")
-			return
-		}
-	} else {
-		err = errHelper.InvalidName.Error
-		logger.ErrorWithStack(ctx, err, "error invalid name")
 		return
 	}
 

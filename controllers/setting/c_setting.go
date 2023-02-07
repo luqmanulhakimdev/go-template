@@ -20,7 +20,6 @@ type SettingService interface {
 	SelectAll(context.Context, *SettingParameter) ([]settingEntity.Setting, error)
 	FindAll(context.Context, *SettingParameter) ([]settingEntity.Setting, services.Pagination, error)
 	FindOne(context.Context, *SettingParameter) (settingEntity.Setting, error)
-	FindDefaultSetting(ctx context.Context) (res settingEntity.SettingDefault, err error)
 	Create(ctx context.Context, input *settingEntity.Setting) (int, error)
 	Update(ctx context.Context, input *settingEntity.Setting) error
 	Delete(ctx context.Context, id int) error

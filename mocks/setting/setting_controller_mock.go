@@ -82,21 +82,6 @@ func (mr *MockSettingServiceMockRecorder) FindAll(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockSettingService)(nil).FindAll), arg0, arg1)
 }
 
-// FindDefaultSetting mocks base method.
-func (m *MockSettingService) FindDefaultSetting(ctx context.Context) (setting0.SettingDefault, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindDefaultSetting", ctx)
-	ret0, _ := ret[0].(setting0.SettingDefault)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FindDefaultSetting indicates an expected call of FindDefaultSetting.
-func (mr *MockSettingServiceMockRecorder) FindDefaultSetting(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindDefaultSetting", reflect.TypeOf((*MockSettingService)(nil).FindDefaultSetting), ctx)
-}
-
 // FindOne mocks base method.
 func (m *MockSettingService) FindOne(arg0 context.Context, arg1 *setting.SettingParameter) (setting0.Setting, error) {
 	m.ctrl.T.Helper()

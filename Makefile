@@ -1,10 +1,10 @@
 .PHONY : build build-darwin coverage
 
 build: main.go
-	GOOS=linux GOARCH=amd64 go build -ldflags '-s -w' -o go-ap-incentive-linux
+	GOOS=linux GOARCH=amd64 go build -ldflags '-s -w' -o go-template-linux
 
 build-darwin: main.go
-	GOOS=darwin GOARCH=amd64 go build -ldflags '-s -w' -o go-ap-incentive-darwin
+	GOOS=darwin GOARCH=amd64 go build -ldflags '-s -w' -o go-template-darwin
 
 run:
 	go run *.go -config_name=config.local
